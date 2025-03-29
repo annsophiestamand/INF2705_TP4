@@ -41,12 +41,36 @@ SceneParticles::SceneParticles(bool& isMouseMotionEnabled)
 
     glEnable(GL_PROGRAM_POINT_SIZE);
     
-    // TODO
+    // Allouer des ressources
+    glGenVertexArrays(1, &m_vao);
+    glGenBuffers(2, m_vbo);
+
+    glBindVertexArray(m_vao);
+
+    // VBO entrée
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Particle) * MAX_N_PARTICULES, particles, GL_DYNAMIC_COPY);
+    
+    // Activer les attributs du VAO
+    for(int i = 0 ; i < 5 ; i++){
+        glEnableVertexAttribArray(i);
+    }
+
+    // VBO sortie
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Particle) * MAX_N_PARTICULES, nullptr, GL_DYNAMIC_COPY);
+
+    // Création objets de rétroaction
+    glGenTransformFeedbacks(1, &m_tfo);
+    glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_tfo);
+    glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, m_vbo[1]);
 }
 
 SceneParticles::~SceneParticles()
 {
-    // TODO
+    glDeleteBuffers(2, m_vbo);
+    glDeleteVertexArrays(1, &m_vao);
+    glDeleteTransformFeedbacks(1, &m_tfo);
 }
 
 void SceneParticles::run(Window& w, double dt)
@@ -68,9 +92,29 @@ void SceneParticles::run(Window& w, double dt)
     glUniform1f(m_timeLocationTransformFeedback, m_totalTime);
     glUniform1f(m_dtLocationTransformFeedback, (float)dt);
     
-    // TODO: buffer binding
-    // TODO: update particles
+    // buffer binding
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)offsetof(Particle, position)); // Position
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)offsetof(Particle, velocity)); // Velocité
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)offsetof(Particle, color)); // Couleur
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)offsetof(Particle, size)); // Taille
+    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)offsetof(Particle, timeToLive)); // Durée de vie
+
+    // update particles
+    glEnable(GL_RASTERIZER_DISCARD);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_DEPTH_TEST);
+
+    glBeginTransformFeedback(GL_POINTS);
+    glDrawArrays(GL_POINTS, 0, m_nParticles);
+    glEndTransformFeedback();
+
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+    glDisable(GL_RASTERIZER_DISCARD);
+
     // TODO: swap buffers
+
 
     m_particleShaderProgram.use();
     m_flameTexture.use(0);
