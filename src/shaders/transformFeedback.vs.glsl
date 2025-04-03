@@ -13,7 +13,7 @@ out vec2 sizeMod;
 out float timeToLiveMod;
 
 uniform float time;
-uniform float dt;
+uniform float dt; // delta time
 
 uint seed = uint(time * 1000.0) + uint(gl_VertexID);
 uint randhash( ) // entre  0 et UINT_MAX
@@ -26,6 +26,11 @@ float random() // entre  0 et 1
 {
     const float UINT_MAX = 4294967295.0;
     return float(randhash()) / UINT_MAX;
+}
+
+float randomInRange(float min, float max) // entre  min et max
+{
+    return min + random() * (max - min);
 }
 
 const float PI = 3.14159265359f;
@@ -55,7 +60,42 @@ const vec3 DARK_RED_COLOR = vec3(0.1, 0.0, 0.0);
 
 const vec3 ACCELERATION = vec3(0.0f, 0.1f, 0.0f);
 
+float getAlphaValue(float timeToLive)
+{
+    float increase = smoothstep(0.0, 0.2, timeToLive);
+    float decrease = smoothstep(0.8, 1.0, timeToLive);
+    return (increase * (1.0 - decrease)) * ALPHA;
+}
+
+vec4 chooseColor(float timeToLive)
+{
+    float timeToLiveNormalised = timeToLive / MAX_TIME_TO_LIVE;
+
+    if (timeToLiveNormalised <= 0.25){
+        return vec4(YELLOW_COLOR, ALPHA);
+    } else if (timeToLiveNormalised <= 0.3){
+        return vec4(mix(YELLOW_COLOR, ORANGE_COLOR, smoothstep(0.25, 0.3, timeToLiveNormalised)), getAlphaValue(timeToLiveNormalised));
+    } else if (timeToLiveNormalised <= 0.5){
+        return vec4(ORANGE_COLOR, ALPHA);
+    } else if(timeToLiveNormalised <= 1) {
+        return vec4(mix(ORANGE_COLOR, DARK_RED_COLOR, smoothstep(0.25, 0.3, timeToLiveNormalised)), getAlphaValue(timeToLiveNormalised));
+    }
+}
+
 void main()
 {
-    // TODO   
+    if(timeToLive < 0.0){
+        positionMod = randomInCircle(0.2, 0.0);
+        velocityMod = randomInCircle(0.5, 5.0);
+        colorMod = vec4(YELLOW_COLOR, 0.0);
+        sizeMod = vec2(0.5, 1.0);
+        timeToLiveMod = randomInRange(1.7, 2.0);
+    } else {
+        positionMod = position + velocity * dt;
+        velocityMod = position + ACCELERATION * dt;
+        colorMod = vec4(YELLOW_COLOR, 0.0);
+        sizeMod = vec2(0.5, 1.0);
+        timeToLiveMod = timeToLive - dt;
+    }
 }
+
