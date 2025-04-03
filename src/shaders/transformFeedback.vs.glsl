@@ -28,6 +28,11 @@ float random() // entre  0 et 1
     return float(randhash()) / UINT_MAX;
 }
 
+float randomInRange(float min, float max) // entre  min et max
+{
+    return min + random() * (max - min);
+}
+
 const float PI = 3.14159265359f;
 vec3 randomInCircle(in float radius, in float height)
 {
@@ -57,5 +62,18 @@ const vec3 ACCELERATION = vec3(0.0f, 0.1f, 0.0f);
 
 void main()
 {
-    // TODO   
+    if(timeToLive < 0.0){
+        positionMod = randomInCircle(0.2, 0.0);
+        velocityMod = randomInCircle(0.5, 5.0);
+        colorMod = vec4(YELLOW_COLOR, 0.0);
+        sizeMod = 
+        timeToLiveMod = randomInRange(1.7, 2.0);
+    } else {
+        positionMod = position + velocity * dt;
+        velocityMod = position + ACCELERATION * dt;
+        colorMod = vec4(YELLOW_COLOR, 0.0);
+        sizeMod = 
+        timeToLiveMod = timeToLive - dt;
+    }
 }
+

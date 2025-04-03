@@ -204,7 +204,6 @@ void SceneParticles::initializeShader()
         ShaderObject vertex("transformFeedback.vs.glsl", GL_VERTEX_SHADER, vertexCode.c_str());
         m_transformFeedbackShaderProgram.attachShaderObject(vertex);
 
-        // TODO
         const char* varyings[] = {"positionMod", "velocityMod", "colorMod", "sizeMod", "timeToLiveMod"};
         m_transformFeedbackShaderProgram.setTransformFeedbackVaryings(varyings, 5, GL_INTERLEAVED_ATTRIBS);
         
