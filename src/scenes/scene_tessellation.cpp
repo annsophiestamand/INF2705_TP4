@@ -30,8 +30,10 @@ SceneTessellation::SceneTessellation(bool& isMouseMotionEnabled)
     initializeShader();    
     initializeTexture();
     generateMesh();
-
     // TODO
+    // Détermine la tailles des polygones de bases (ici, quadrilatères)
+    glPatchParameteri(GL_PATCH_VERTICES, 4);
+
 }
 
 void SceneTessellation::run(Window& w, double dt)
@@ -62,7 +64,7 @@ void SceneTessellation::run(Window& w, double dt)
     
     m_terrainVao.bind();
     // TODO
-    //glDrawArrays(, 0, m_terrainVerticesCount);
+    glDrawArrays(GL_PATCHES, 0, m_terrainVerticesCount);
 }
 
 void SceneTessellation::updateInput(Window& w, double dt)
@@ -156,8 +158,9 @@ void SceneTessellation::generateMesh()
         planeData[i++] = -1.0f;
         planeData[i++] = y * FACTOR + OFFSET;
     }
-
+    
     m_terrainBuffer.allocate(GL_ARRAY_BUFFER, sizeof(planeData), planeData, GL_STATIC_DRAW);
+    m_terrainVao.bind();
     m_terrainVao.specifyAttribute(m_terrainBuffer, 0, 3, 0, 0);
 }
 
