@@ -33,6 +33,7 @@ private:
     void initializeShader();
     void initializeTexture();
     void drawMenu();
+    void bindBuffer();
     
     glm::mat4 getCameraThirdPerson(float dist = 4.0f);    
     glm::mat4 getProjectionMatrix(Window& w);

@@ -13,7 +13,7 @@ out vec2 sizeMod;
 out float timeToLiveMod;
 
 uniform float time;
-uniform float dt;
+uniform float dt; // delta time
 
 uint seed = uint(time * 1000.0) + uint(gl_VertexID);
 uint randhash( ) // entre  0 et UINT_MAX
