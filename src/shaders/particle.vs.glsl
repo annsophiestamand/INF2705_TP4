@@ -16,5 +16,8 @@ out ATTRIB_VS_OUT
 
 void main()
 {
-    // TODO
+    vec3 debugPosition = vec3(0.0, 0.0, 0.0);
+    gl_Position = modelView * vec4(debugPosition, 1.0);
+    attribOut.color = vec4(1.0, 0.0, 0.0, 1.0);
+    attribOut.size = vec2(0.1, 0.1);
 }

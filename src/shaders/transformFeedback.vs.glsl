@@ -80,21 +80,27 @@ vec4 chooseColor(float timeToLive)
     } else if(timeToLiveNormalised <= 1) {
         return vec4(mix(ORANGE_COLOR, DARK_RED_COLOR, smoothstep(0.25, 0.3, timeToLiveNormalised)), getAlphaValue(timeToLiveNormalised));
     }
+    return vec4(YELLOW_COLOR, ALPHA); // Par défaut je retourne du jaune
 }
 
 void main()
 {
     if(timeToLive < 0.0){
         positionMod = randomInCircle(0.2, 0.0);
-        velocityMod = randomInCircle(0.5, 5.0);
+        vec3 particleCone = randomInCircle(0.5, 5.0);
+        float particleModule = randomInRange(0.5, 0.6);
+        velocityMod = particleCone * particleModule;
         colorMod = vec4(YELLOW_COLOR, 0.0);
         sizeMod = vec2(0.5, 1.0);
         timeToLiveMod = randomInRange(1.7, 2.0);
     } else {
         positionMod = position + velocity * dt;
-        velocityMod = position + ACCELERATION * dt;
-        colorMod = vec4(YELLOW_COLOR, 0.0);
-        sizeMod = vec2(0.5, 1.0);
+        velocityMod = velocity + ACCELERATION * dt;
+        colorMod = chooseColor(timeToLive);
+
+        float normalizedTime = timeToLive / MAX_TIME_TO_LIVE;
+        float scale = mix(1.0, 1.5, normalizedTime);
+        sizeMod = vec2(0.5, 1.0) * scale;
         timeToLiveMod = timeToLive - dt;
     }
 }
