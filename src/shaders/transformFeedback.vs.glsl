@@ -60,43 +60,46 @@ const vec3 DARK_RED_COLOR = vec3(0.1, 0.0, 0.0);
 
 const vec3 ACCELERATION = vec3(0.0f, 0.1f, 0.0f);
 
-float getAlphaValue(float timeToLive)
+float getAlphaValue(float timeToLiveNormalised)
 {
-    float increase = smoothstep(0.0, 0.2, timeToLive);
-    float decrease = smoothstep(0.8, 1.0, timeToLive);
+    float increase = smoothstep(0.0, 0.2, timeToLiveNormalised);
+    float decrease = smoothstep(0.8, 1.0, timeToLiveNormalised);
     return (increase * (1.0 - decrease)) * ALPHA;
 }
 
-vec4 chooseColor(float timeToLive)
+vec4 chooseColor(float timeToLiveNormalised)
 {
-    float timeToLiveNormalised = timeToLive / MAX_TIME_TO_LIVE;
-
     if (timeToLiveNormalised <= 0.25){
-        return vec4(YELLOW_COLOR, ALPHA);
+        return vec4(YELLOW_COLOR, getAlphaValue(timeToLiveNormalised));
     } else if (timeToLiveNormalised <= 0.3){
         return vec4(mix(YELLOW_COLOR, ORANGE_COLOR, smoothstep(0.25, 0.3, timeToLiveNormalised)), getAlphaValue(timeToLiveNormalised));
     } else if (timeToLiveNormalised <= 0.5){
-        return vec4(ORANGE_COLOR, ALPHA);
+        return vec4(ORANGE_COLOR, getAlphaValue(timeToLiveNormalised));
     } else if(timeToLiveNormalised <= 1) {
-        return vec4(mix(ORANGE_COLOR, DARK_RED_COLOR, smoothstep(0.25, 0.3, timeToLiveNormalised)), getAlphaValue(timeToLiveNormalised));
+        return vec4(mix(ORANGE_COLOR, DARK_RED_COLOR, smoothstep(0.5, 1.0, timeToLiveNormalised)), getAlphaValue(timeToLiveNormalised));
     }
-    return vec4(YELLOW_COLOR, ALPHA); // Par défaut je retourne du jaune
+    return vec4(ORANGE_COLOR, getAlphaValue(timeToLiveNormalised)); // Par défaut je retourne du orange
 }
 
 void main()
 {
     if(timeToLive < 0.0){
-        positionMod = randomInCircle(0.2, 0.0);
-        vec3 particleCone = randomInCircle(0.5, 5.0);
-        float particleModule = randomInRange(0.5, 0.6);
-        velocityMod = particleCone * particleModule;
-        colorMod = vec4(YELLOW_COLOR, 0.0);
+        vec3 initialPosition = randomInCircle(INITIAL_RADIUS, INITIAL_HEIGHT);
+        vec3 maxPosition = randomInCircle(FINAL_RADIUS, FINAL_HEIGHT);
+        vec3 direction = normalize(maxPosition - initialPosition);
+        float speed = randomInRange(INITIAL_SPEED_MIN, INITIAL_SPEED_MAX);
+        
+        positionMod = initialPosition;
+        velocityMod = direction * speed;
+        colorMod = vec4(YELLOW_COLOR, INITIAL_ALPHA);
         sizeMod = vec2(0.5, 1.0);
-        timeToLiveMod = randomInRange(1.7, 2.0);
+        timeToLiveMod = randomInRange(MIN_TIME_TO_LIVE, MAX_TIME_TO_LIVE);
     } else {
         positionMod = position + velocity * dt;
         velocityMod = velocity + ACCELERATION * dt;
-        colorMod = chooseColor(timeToLive);
+
+        float timeToLiveNormalised = 1 - (timeToLive / MAX_TIME_TO_LIVE);
+        colorMod = chooseColor(timeToLiveNormalised);
 
         float normalizedTime = timeToLive / MAX_TIME_TO_LIVE;
         float scale = mix(1.0, 1.5, normalizedTime);

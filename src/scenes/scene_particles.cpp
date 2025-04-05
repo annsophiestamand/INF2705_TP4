@@ -123,7 +123,7 @@ void SceneParticles::run(Window& w, double dt)
     glEnable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+    glDrawArrays(GL_POINTS, 0, m_nParticles);
     if (m_cumulativeTime > 1.0f / 60.0f)
     {
         m_cumulativeTime = 0.0f;
@@ -168,11 +168,13 @@ void SceneParticles::drawMenu()
 
 void SceneParticles::bindBuffer()
 {
+    glBindVertexArray(m_vao);
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo[0]);
 
     // Préciser où prendre les entrées du shader transform feedback
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)offsetof(Particle, position)); // Position
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)offsetof(Particle, velocity)); // Velocité        glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)offsetof(Particle, color)); // Couleur
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)offsetof(Particle, velocity)); // Velocité        
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)offsetof(Particle, color)); // Couleur
     glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)offsetof(Particle, size)); // Taille
     glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)offsetof(Particle, timeToLive)); // Durée de vie
 
