@@ -95,14 +95,12 @@ void main()
         sizeMod = vec2(0.5, 1.0);
         timeToLiveMod = randomInRange(MIN_TIME_TO_LIVE, MAX_TIME_TO_LIVE);
     } else {
+        float timeToLiveNormalised = 1 - (timeToLive / MAX_TIME_TO_LIVE);
+        float scale = mix(1.0, 1.5, timeToLiveNormalised);
+        
         positionMod = position + velocity * dt;
         velocityMod = velocity + ACCELERATION * dt;
-
-        float timeToLiveNormalised = 1 - (timeToLive / MAX_TIME_TO_LIVE);
         colorMod = chooseColor(timeToLiveNormalised);
-
-        float normalizedTime = timeToLive / MAX_TIME_TO_LIVE;
-        float scale = mix(1.0, 1.5, normalizedTime);
         sizeMod = vec2(0.5, 1.0) * scale;
         timeToLiveMod = timeToLive - dt;
     }

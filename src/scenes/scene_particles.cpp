@@ -105,8 +105,6 @@ void SceneParticles::run(Window& w, double dt)
     glEndTransformFeedback();
 
     glDisable(GL_RASTERIZER_DISCARD);
-    glDisable(GL_BLEND);
-    glEnable(GL_DEPTH_TEST);
 
     // swap buffers
     std::swap(m_vbo[0], m_vbo[1]);
@@ -120,8 +118,6 @@ void SceneParticles::run(Window& w, double dt)
     bindBuffer();
 
     // Draw particles without depth write and with blending
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDrawArrays(GL_POINTS, 0, m_nParticles);
     if (m_cumulativeTime > 1.0f / 60.0f)
