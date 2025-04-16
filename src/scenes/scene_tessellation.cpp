@@ -58,7 +58,7 @@ void SceneTessellation::run(Window& w, double dt)
     glUniform1i(m_viewWireframeLocation, m_viewWireframe);
 
     // TODO: To remove, only for debug
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);//GL_FILL
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);//GL_FILL
     
     m_terrainVao.bind();
     // TODO
